@@ -190,8 +190,16 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
 	CGSize keyboardSize = keyboardRect.size;
 
+	// Cater for accessory height
+	CGFloat accessoryHeight = 0;
+	for (QEntryTableViewCell *cell in self.quickDialogTableView.visibleCells) {
+		if ([cell respondsToSelector:@selector(textField)] && cell.textField.isFirstResponder) {
+			accessoryHeight = cell.textField.inputAccessoryView.frame.size.height;
+		}
+	}
+
 	CGRect viewFrame = self.quickDialogTableView.frame;
-	viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
+	viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height - accessoryHeight);
 
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationBeginsFromCurrentState:YES];

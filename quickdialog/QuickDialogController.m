@@ -12,8 +12,12 @@
 // permissions and limitations under the License.
 //
 
+static const CGFloat kKeyboardAnimationDuration = 0.3;
 
 @interface QuickDialogController ()
+
+@property (nonatomic, assign) BOOL keyboardIsShown;
+@property (nonatomic, strong) QuickDialogTableView *tableView;
 
 + (Class)controllerClassForRoot:(QRootElement *)root;
 
@@ -30,6 +34,8 @@
 @synthesize willDisappearCallback = _willDisappearCallback;
 @synthesize quickDialogTableView = _quickDialogTableView;
 @synthesize resizeWhenKeyboardPresented = _resizeWhenKeyboardPresented;
+@synthesize keyboardIsShown = _keyboardIsShown;
+@synthesize tableView = tableView_;
 
 
 + (QuickDialogController *)buildControllerWithClass:(Class)controllerClass root:(QRootElement *)root {
@@ -63,6 +69,7 @@
     [super loadView];
     self.quickDialogTableView = [[QuickDialogTableView alloc] initWithController:self];
     self.view = self.quickDialogTableView;
+	self.tableView = self.quickDialogTableView;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -129,50 +136,74 @@
     return [QuickDialogController buildControllerWithClass:controllerClass root:root];
 }
 
+- (void)viewDidLoad {
+	[super viewDidLoad];
 
-- (void) resizeForKeyboard:(NSNotification*)aNotification {
-    if (!_viewOnScreen)
-        return;
-
-    BOOL up = aNotification.name == UIKeyboardWillShowNotification;
-
-    if (_keyboardVisible == up)
-        return;
-
-    _keyboardVisible = up;
-    NSDictionary* userInfo = [aNotification userInfo];
-    NSTimeInterval animationDuration;
-    UIViewAnimationCurve animationCurve;
-    CGRect keyboardEndFrame;
-    [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
-    [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
-    [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] getValue:&keyboardEndFrame];
-
-    [UIView animateWithDuration:animationDuration delay:0 options:animationCurve
-        animations:^{
-            CGRect keyboardFrame = [self.view convertRect:keyboardEndFrame toView:nil];
-            self.quickDialogTableView.contentInset = UIEdgeInsetsMake(0.0, 0.0,  up ? keyboardFrame.size.height : 0, 0.0);
-        }
-        completion:NULL];
+	[[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(keyboardWillShow:) 
+												 name:UIKeyboardWillShowNotification 
+											   object:self.view.window];
+	[[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(keyboardWillHide:) 
+												 name:UIKeyboardWillHideNotification 
+											   object:self.view.window];
+	self.keyboardIsShown = NO;
 }
 
-- (void)setResizeWhenKeyboardPresented:(BOOL)observesKeyboard {
-  if (observesKeyboard != _resizeWhenKeyboardPresented) {
-    _resizeWhenKeyboardPresented = observesKeyboard;
-
-    if (_resizeWhenKeyboardPresented) {
-      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resizeForKeyboard:) name:UIKeyboardWillShowNotification object:nil];
-      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resizeForKeyboard:) name:UIKeyboardWillHideNotification object:nil];
-    } else {
-      [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-      [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-    }
-  }
+- (void)viewDidUnload {
+	[[NSNotificationCenter defaultCenter] removeObserver:self 
+													name:UIKeyboardWillShowNotification 
+												  object:nil]; 
+	[[NSNotificationCenter defaultCenter] removeObserver:self 
+													name:UIKeyboardWillHideNotification 
+												  object:nil];	
 }
 
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+- (void)keyboardWillHide:(NSNotification *)n {
+	NSDictionary *userInfo = [n userInfo];
+
+	// Get the size of the keyboard
+	CGRect keyboardRect = [[userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+	keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
+	CGSize keyboardSize = keyboardRect.size;
+
+	// Resize the scrollview
+	CGRect viewFrame = self.tableView.frame;
+	viewFrame.size.height += (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
+
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationBeginsFromCurrentState:YES];
+	[UIView setAnimationDuration:kKeyboardAnimationDuration];
+	[self.tableView setFrame:viewFrame];
+	[UIView commitAnimations];
+
+	self.keyboardIsShown = NO;
+}
+
+- (void)keyboardWillShow:(NSNotification *)n {
+	// Ensure that we do not do the frame size adjustment on the UIScrollView if the keyboard is already shown.
+	// This can happen if the user, after fixing editing a UITextField, scrolls the resized UIScrollView to another UITextField and attempts to edit the next UITextField.
+	// If we were to resize the UIScrollView again, it would be disastrous.  NOTE: The keyboard notification will fire even when the keyboard is already shown.
+	if (self.keyboardIsShown) return;
+
+	NSDictionary *userInfo = [n userInfo];
+
+	// Get the size of the keyboard
+	CGRect keyboardRect = [[userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
+	keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
+	CGSize keyboardSize = keyboardRect.size;
+
+	CGRect viewFrame = self.tableView.frame;
+	viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
+
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationBeginsFromCurrentState:YES];
+
+	[UIView setAnimationDuration:kKeyboardAnimationDuration];
+	[self.tableView setFrame:viewFrame];
+	[UIView commitAnimations];
+
+	self.keyboardIsShown = YES;
 }
 
 

@@ -17,7 +17,6 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 @interface QuickDialogController ()
 
 @property (nonatomic, assign) BOOL keyboardIsShown;
-@property (nonatomic, strong) QuickDialogTableView *tableView;
 
 + (Class)controllerClassForRoot:(QRootElement *)root;
 
@@ -35,7 +34,6 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 @synthesize quickDialogTableView = _quickDialogTableView;
 @synthesize resizeWhenKeyboardPresented = _resizeWhenKeyboardPresented;
 @synthesize keyboardIsShown = _keyboardIsShown;
-@synthesize tableView = tableView_;
 
 
 + (QuickDialogController *)buildControllerWithClass:(Class)controllerClass root:(QRootElement *)root {
@@ -69,7 +67,6 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
     [super loadView];
     self.quickDialogTableView = [[QuickDialogTableView alloc] initWithController:self];
     self.view = self.quickDialogTableView;
-	self.tableView = self.quickDialogTableView;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -168,13 +165,13 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	CGSize keyboardSize = keyboardRect.size;
 
 	// Resize the scrollview
-	CGRect viewFrame = self.tableView.frame;
+	CGRect viewFrame = self.quickDialogTableView.frame;
 	viewFrame.size.height += (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
 
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationBeginsFromCurrentState:YES];
 	[UIView setAnimationDuration:kKeyboardAnimationDuration];
-	[self.tableView setFrame:viewFrame];
+	[self.quickDialogTableView setFrame:viewFrame];
 	[UIView commitAnimations];
 
 	self.keyboardIsShown = NO;
@@ -193,14 +190,14 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
 	CGSize keyboardSize = keyboardRect.size;
 
-	CGRect viewFrame = self.tableView.frame;
+	CGRect viewFrame = self.quickDialogTableView.frame;
 	viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
 
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationBeginsFromCurrentState:YES];
 
 	[UIView setAnimationDuration:kKeyboardAnimationDuration];
-	[self.tableView setFrame:viewFrame];
+	[self.quickDialogTableView setFrame:viewFrame];
 	[UIView commitAnimations];
 
 	self.keyboardIsShown = YES;

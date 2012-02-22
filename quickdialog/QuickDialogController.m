@@ -104,6 +104,7 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
     if (_willDisappearCallback!=nil){
         _willDisappearCallback();
     }
+	[self.view endEditing:YES];
 }
 
 - (void)popToPreviousRootElement {

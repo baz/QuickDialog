@@ -37,6 +37,7 @@
 - (void)addSection:(QSection *)section;
 - (QSection *)getSectionForIndex:(NSInteger)index;
 - (NSInteger)numberOfSections;
+- (NSInteger)numberOfElements;
 
 
 - (QElement *)elementWithKey:(NSString *)string;

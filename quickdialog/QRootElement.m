@@ -39,6 +39,15 @@
     return [_sections count];
 }
 
+- (NSInteger)numberOfElements {
+    NSInteger num = 0;
+    for (QSection *section in _sections) {
+        num += [section.elements count];
+    }
+
+    return num;
+}
+
 - (UITableViewCell *)getCellForTableView:(QuickDialogTableView *)tableView controller:(QuickDialogController *)controller {
     UITableViewCell *cell = [super getCellForTableView:tableView controller:controller];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;

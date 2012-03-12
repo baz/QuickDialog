@@ -101,6 +101,7 @@
     if (dateElement.dateValue!=nil)
         _pickerView.date = dateElement.dateValue;
     _textField.placeholder = dateElement.placeholder;
+	[self setNeedsLayout];
 
     _textField.inputAccessoryView.hidden = entry.hiddenToolbar;
 }

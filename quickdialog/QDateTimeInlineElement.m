@@ -20,6 +20,7 @@
 @synthesize dateValue = _dateValue;
 @synthesize mode = _mode;
 @synthesize centerLabel = _centerLabel;
+@synthesize selectionStyle = _selectionStyle;
 
 - (QDateTimeInlineElement *)init {
     self = [super init];
@@ -36,6 +37,7 @@
     if (self!=nil){
         _dateValue = date;
         _mode = UIDatePickerModeDateAndTime;
+		_selectionStyle = UITableViewCellSelectionStyleGray;
     }
     return self;
 }

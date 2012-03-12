@@ -20,6 +20,7 @@
 @private
     UIDatePickerMode _mode;
     BOOL _centerLabel;
+    UITableViewCellSelectionStyle _selectionStyle;
 }
 
 @property(nonatomic, retain) NSDate *dateValue;
@@ -27,6 +28,8 @@
 @property (assign) UIDatePickerMode mode;
 
 @property(nonatomic) BOOL centerLabel;
+
+@property (nonatomic) UITableViewCellSelectionStyle selectionStyle;
 
 - (QDateTimeInlineElement *)initWithDate:(NSDate *)date;
 

@@ -26,7 +26,6 @@
     self = [self initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"QuickformDateTimeInlineElement"];
     if (self!=nil){
         [self createSubviews];
-		self.selectionStyle = UITableViewCellSelectionStyleGray;
     }
     return self;
 }
@@ -58,6 +57,11 @@
     [self prepareForElement:_entryElement inTableView:_quickformTableView];
 }
 
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    [super textFieldDidEndEditing:textField];
+    [_quickformTableView deselectRowAtIndexPath:_quickformTableView.indexPathForSelectedRow animated:YES];
+}
+
 - (void)prepareForElement:(QEntryElement *)element inTableView:(QuickDialogTableView *)tableView {
     QDateTimeInlineElement *entry = (QDateTimeInlineElement *)element;
     [super prepareForElement:element inTableView:tableView];
@@ -84,14 +88,13 @@
 			break;
     }
 	
+	self.selectionStyle = dateElement.selectionStyle;
     if (!entry.centerLabel){
 		self.textLabel.text = element.title;
-        self.selectionStyle = UITableViewCellSelectionStyleNone;
         self.centeredLabel.text = nil;
 		self.detailTextLabel.text = [dateFormatter stringFromDate:dateElement.dateValue];
 		
     } else {
-        self.selectionStyle = UITableViewCellSelectionStyleBlue;
         self.textLabel.text = nil;
 		self.centeredLabel.text = [dateFormatter stringFromDate:dateElement.dateValue];
     }

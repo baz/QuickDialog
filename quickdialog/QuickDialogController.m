@@ -79,6 +79,12 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
     return YES;
 }
 
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation duration:(NSTimeInterval)duration {
+	[super willAnimateRotationToInterfaceOrientation:interfaceOrientation duration:duration];
+
+	self.sizedHeight = 0;
+}
+
 - (QuickDialogController *)initWithRoot:(QRootElement *)rootElement {
     self = [super init];
     if (self) {

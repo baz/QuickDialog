@@ -168,7 +168,6 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	// Get the size of the keyboard
 	CGRect keyboardRect = [[userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue];
 	keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
-	CGSize keyboardSize = keyboardRect.size;
 
 	// Resize the scrollview
 	CGRect viewFrame = self.quickDialogTableView.frame;

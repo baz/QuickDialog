@@ -19,6 +19,7 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 @property (nonatomic, assign) BOOL keyboardIsShown;
 
 + (Class)controllerClassForRoot:(QRootElement *)root;
+- (CGFloat)accessoryHeight;
 
 @end
 
@@ -167,7 +168,7 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 
 	// Resize the scrollview
 	CGRect viewFrame = self.quickDialogTableView.frame;
-	viewFrame.size.height += (keyboardSize.height - self.tabBarController.tabBar.frame.size.height);
+	viewFrame.size.height += (keyboardSize.height - self.tabBarController.tabBar.frame.size.height - self.accessoryHeight);
 
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationBeginsFromCurrentState:YES];
@@ -191,16 +192,8 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	keyboardRect = [self.view convertRect:keyboardRect fromView:nil];
 	CGSize keyboardSize = keyboardRect.size;
 
-	// Cater for accessory height
-	CGFloat accessoryHeight = 0;
-	for (QEntryTableViewCell *cell in self.quickDialogTableView.visibleCells) {
-		if ([cell respondsToSelector:@selector(textField)] && cell.textField.isFirstResponder) {
-			accessoryHeight = cell.textField.inputAccessoryView.frame.size.height;
-		}
-	}
-
 	CGRect viewFrame = self.quickDialogTableView.frame;
-	viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height - accessoryHeight);
+	viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height - self.accessoryHeight);
 
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationBeginsFromCurrentState:YES];
@@ -210,6 +203,17 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	[UIView commitAnimations];
 
 	self.keyboardIsShown = YES;
+}
+
+- (CGFloat)accessoryHeight {
+	CGFloat accessoryHeight = 0;
+	for (QEntryTableViewCell *cell in self.quickDialogTableView.visibleCells) {
+		if ([cell respondsToSelector:@selector(textField)] && cell.textField.isFirstResponder) {
+			accessoryHeight = cell.textField.inputAccessoryView.frame.size.height;
+		}
+	}
+
+	return accessoryHeight;
 }
 
 

@@ -17,6 +17,8 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 @interface QuickDialogController ()
 
 @property (nonatomic, assign) BOOL keyboardIsShown;
+@property (nonatomic, assign) CGFloat originalHeight;
+@property (nonatomic, assign) CGFloat sizedHeight;
 
 + (Class)controllerClassForRoot:(QRootElement *)root;
 - (CGFloat)accessoryHeight;
@@ -35,6 +37,8 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 @synthesize quickDialogTableView = _quickDialogTableView;
 @synthesize resizeWhenKeyboardPresented = _resizeWhenKeyboardPresented;
 @synthesize keyboardIsShown = _keyboardIsShown;
+@synthesize originalHeight = originalHeight_;
+@synthesize sizedHeight = sizedHeight_;
 
 
 + (QuickDialogController *)buildControllerWithClass:(Class)controllerClass root:(QRootElement *)root {
@@ -168,7 +172,7 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 
 	// Resize the scrollview
 	CGRect viewFrame = self.quickDialogTableView.frame;
-	viewFrame.size.height += (keyboardSize.height - self.tabBarController.tabBar.frame.size.height - self.accessoryHeight);
+	viewFrame.size.height = self.originalHeight;
 
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationBeginsFromCurrentState:YES];
@@ -193,7 +197,14 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	CGSize keyboardSize = keyboardRect.size;
 
 	CGRect viewFrame = self.quickDialogTableView.frame;
-	viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height - self.accessoryHeight);
+	self.originalHeight = viewFrame.size.height;
+
+	if (self.sizedHeight) {
+		viewFrame.size.height = self.sizedHeight;
+	} else {
+		viewFrame.size.height -= (keyboardSize.height - self.tabBarController.tabBar.frame.size.height - self.accessoryHeight);
+		self.sizedHeight = viewFrame.size.height;
+	}
 
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationBeginsFromCurrentState:YES];
@@ -208,8 +219,9 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 - (CGFloat)accessoryHeight {
 	CGFloat accessoryHeight = 0;
 	for (QEntryTableViewCell *cell in self.quickDialogTableView.visibleCells) {
-		if ([cell respondsToSelector:@selector(textField)] && cell.textField.isFirstResponder) {
+		if ([cell respondsToSelector:@selector(textField)] && cell.textField.isFirstResponder && cell.textField.inputAccessoryView) {
 			accessoryHeight = cell.textField.inputAccessoryView.frame.size.height;
+			break;
 		}
 	}
 

@@ -145,8 +145,8 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
     return [QuickDialogController buildControllerWithClass:controllerClass root:root];
 }
 
-- (void)viewDidLoad {
-	[super viewDidLoad];
+- (void)viewDidAppear:(BOOL)animated {
+	[super viewDidAppear:animated];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self 
 											 selector:@selector(keyboardWillShow:) 
@@ -159,7 +159,9 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 	self.keyboardIsShown = NO;
 }
 
-- (void)viewDidUnload {
+- (void)viewDidDisappear:(BOOL)animated {
+	[super viewDidDisappear:animated];
+
 	[[NSNotificationCenter defaultCenter] removeObserver:self 
 													name:UIKeyboardWillShowNotification 
 												  object:nil]; 

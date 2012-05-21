@@ -107,6 +107,16 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
     [super viewWillAppear:animated];
     if (_root!=nil)
         self.title = _root.title;
+
+	[[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(keyboardWillShow:) 
+												 name:UIKeyboardWillShowNotification 
+											   object:self.view.window];
+	[[NSNotificationCenter defaultCenter] addObserver:self 
+											 selector:@selector(keyboardWillHide:) 
+												 name:UIKeyboardWillHideNotification 
+											   object:self.view.window];
+	self.keyboardIsShown = NO;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -116,6 +126,13 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
         _willDisappearCallback();
     }
 	[self.view endEditing:YES];
+
+	[[NSNotificationCenter defaultCenter] removeObserver:self 
+													name:UIKeyboardWillShowNotification 
+												  object:nil]; 
+	[[NSNotificationCenter defaultCenter] removeObserver:self 
+													name:UIKeyboardWillHideNotification 
+												  object:nil];	
 }
 
 - (void)popToPreviousRootElement {
@@ -143,31 +160,6 @@ static const CGFloat kKeyboardAnimationDuration = 0.3;
 - (QuickDialogController *)controllerForRoot:(QRootElement *)root {
     Class controllerClass = [[self class] controllerClassForRoot:root];
     return [QuickDialogController buildControllerWithClass:controllerClass root:root];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-	[super viewDidAppear:animated];
-
-	[[NSNotificationCenter defaultCenter] addObserver:self 
-											 selector:@selector(keyboardWillShow:) 
-												 name:UIKeyboardWillShowNotification 
-											   object:self.view.window];
-	[[NSNotificationCenter defaultCenter] addObserver:self 
-											 selector:@selector(keyboardWillHide:) 
-												 name:UIKeyboardWillHideNotification 
-											   object:self.view.window];
-	self.keyboardIsShown = NO;
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-	[super viewDidDisappear:animated];
-
-	[[NSNotificationCenter defaultCenter] removeObserver:self 
-													name:UIKeyboardWillShowNotification 
-												  object:nil]; 
-	[[NSNotificationCenter defaultCenter] removeObserver:self 
-													name:UIKeyboardWillHideNotification 
-												  object:nil];	
 }
 
 - (void)keyboardWillHide:(NSNotification *)n {

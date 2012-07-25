@@ -106,6 +106,7 @@
     _textField.autocapitalizationType = _entryElement.autocapitalizationType;
     _textField.autocorrectionType = _entryElement.autocorrectionType;
     _textField.keyboardType = _entryElement.keyboardType;
+    _textField.accessibilityLabel = _entryElement.accessibilityLabel;
     _textField.keyboardAppearance = _entryElement.keyboardAppearance;
     _textField.secureTextEntry = _entryElement.secureTextEntry;
     

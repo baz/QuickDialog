@@ -63,7 +63,7 @@
 
 - (CGFloat)getRowHeightForTableView:(QuickDialogTableView *)tableView {
 
-    if (_text==nil || _text == @""){
+    if (_text==nil || [_text isEqual: @""]){
         return [super getRowHeightForTableView:tableView];
     }
     CGSize constraint = CGSizeMake(280, 20000);
